@@ -1,0 +1,2 @@
+CREATE EXTENSION earthdistance;
+CREATE EXTENSION vector;

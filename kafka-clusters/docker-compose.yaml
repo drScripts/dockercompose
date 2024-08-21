@@ -1,0 +1,157 @@
+version: '3.7'
+
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper1
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: "zookeeper1:2888:3888;zookeeper2:2890:3890;zookeeper3:2891:3891"
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    volumes:
+      - ./zookeeper-data:/var/lib/zookeeper
+    networks:
+      - kafka-net
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper2
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: "zookeeper1:2888:3888;zookeeper2:2890:3890;zookeeper3:2891:3891"
+    ports:
+      - "2182:2181"
+      - "2890:2888"
+      - "3890:3888"
+    volumes:
+      - ./zookeeper-data:/var/lib/zookeeper
+    networks:
+      - kafka-net
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper3
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2183
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: "zookeeper1:2888:3888;zookeeper2:2890:3890;zookeeper3:2891:3891"
+    ports:
+      - "2183:2181"
+      - "2891:2888"
+      - "3891:3888"
+    volumes:
+      - ./zookeeper-data:/var/lib/zookeeper
+    networks:
+      - kafka-net
+
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_MESSAGE_MAX_BYTES: 115343360
+      KAFKA_CFG_PRODUCER_MAX_REQUEST_SIZE: 115343360
+      KAFKA_CFG_CONNECT_PRODUCER_MAX_REQUEST_SIZE: 115343360
+      KAFKA_CFG_FETCH_MESSAGE_MAX_BYTES: 115343360
+      KAFKA_CFG_SOCKET_REQUEST_MAX_BYTES: 115343360
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper1:2181,zookeeper2:2182,zookeeper3:2183"
+      KAFKA_LISTENERS: PLAINTEXT://:9091
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./kafka-data:/var/lib/kafka
+    networks:
+      - kafka-net
+
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka2
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_CFG_MESSAGE_MAX_BYTES: 115343360
+      KAFKA_CFG_PRODUCER_MAX_REQUEST_SIZE: 115343360
+      KAFKA_CFG_CONNECT_PRODUCER_MAX_REQUEST_SIZE: 115343360
+      KAFKA_CFG_FETCH_MESSAGE_MAX_BYTES: 115343360
+      KAFKA_CFG_SOCKET_REQUEST_MAX_BYTES: 115343360
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper1:2181,zookeeper2:2182,zookeeper3:2183"
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9092:9091"
+    volumes:
+      - ./kafka-data:/var/lib/kafka
+    networks:
+      - kafka-net
+
+  kafka-3:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka3
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_CFG_MESSAGE_MAX_BYTES: 115343360
+      KAFKA_CFG_PRODUCER_MAX_REQUEST_SIZE: 115343360
+      KAFKA_CFG_CONNECT_PRODUCER_MAX_REQUEST_SIZE: 115343360
+      KAFKA_CFG_FETCH_MESSAGE_MAX_BYTES: 115343360
+      KAFKA_CFG_SOCKET_REQUEST_MAX_BYTES: 115343360
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper1:2181,zookeeper2:2182,zookeeper3:2183"
+      KAFKA_LISTENERS: PLAINTEXT://:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9093:9091"
+    volumes:
+      - ./kafka-data:/var/lib/kafka
+    networks:
+      - kafka-net
+
+networks:
+  kafka-net:
+    driver: bridge
+
+volumes:
+  zookeeper-data:
+  kafka-data:

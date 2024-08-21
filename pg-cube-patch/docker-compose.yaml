@@ -5,7 +5,7 @@ services:
     container_name: pg-db
     build:
       context: .
-      dockerfile: postgresql-patch-cube-dockerfile
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "5432:5432"
@@ -13,7 +13,7 @@ services:
       POSTGRES_USER: mejik
       POSTGRES_PASSWORD: 2wsx1qaz
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - local_pgdata:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
